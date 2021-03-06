@@ -1,0 +1,23 @@
+Escaped mutants:
+================
+
+
+1) C:\Users\jimas\Documents\Projects\Php\Enums\src\EnumJsonFormat.php:91    [M] ProtectedVisibility
+
+--- Original
++++ New
+@@ @@
+      * 
+      * @return self
+      */
+-    protected static function getInstance(string $key) : self
++    private static function getInstance(string $key) : self
+     {
+         if (isset(self::$instances[$key])) {
+             return self::$instances[$key];
+
+Timed Out mutants:
+==================
+
+Not Covered mutants:
+====================
