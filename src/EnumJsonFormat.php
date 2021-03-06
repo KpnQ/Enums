@@ -4,11 +4,22 @@ namespace Jac\Enums;
 
 use JsonSerializable;
 
+/**
+ * Class to add new json formatter for json
+ * 
+ * @link https://github.com/KpnQ/Enums.git for more details
+ * @licence http://www.opensource.org/licenses/mit-license.php 
+ *      MIT (see the LICENSE file)
+ * 
+ * 
+ * @example ../example/index.php 
+ * 
+ */
 class EnumJsonFormat implements JsonSerializable
 {
-    private const AS_KEY_VALUE_OBJECT = 'keyValuesStrategy';
-    private const AS_STRING = 'toStringStrategy';
-    private const KEY_AND_VALUE_AS_OBJECT_VALUE = 'keyAndValueAsValueStrategy';
+    protected const AS_KEY_VALUE_OBJECT = 'keyValuesStrategy';
+    protected const AS_STRING = 'toStringStrategy';
+    protected const KEY_AND_VALUE_AS_OBJECT_VALUE = 'keyAndValueAsValueStrategy';
 
     /**
      * @readonly
@@ -26,7 +37,7 @@ class EnumJsonFormat implements JsonSerializable
      */
     private static $instances = array();
 
-    private function __construct(string $function)
+    final private function __construct(string $function)
     {
         $this->function = $function;
     }
@@ -38,9 +49,9 @@ class EnumJsonFormat implements JsonSerializable
      * @example "enumValue"
      * @return self
      */
-    public static function asString(): self
+    final public static function asString(): self
     {
-        return self::getInstance(static::AS_STRING);
+        return self::getInstance(self::AS_STRING);
     }
 
     /**
@@ -52,9 +63,9 @@ class EnumJsonFormat implements JsonSerializable
      * }
      * @return self
      */
-    public static function asKeyValue(): self
+    final public static function asKeyValue(): self
     {
-        return self::getInstance(static::AS_KEY_VALUE_OBJECT);
+        return self::getInstance(self::AS_KEY_VALUE_OBJECT);
     }
 
     /**
@@ -67,9 +78,9 @@ class EnumJsonFormat implements JsonSerializable
      * }
      * 
      */
-    public static function keyAndValueAsValues(): self
+    final public static function keyAndValueAsValues(): self
     {
-        return self::getInstance(static::KEY_AND_VALUE_AS_OBJECT_VALUE);
+        return self::getInstance(self::KEY_AND_VALUE_AS_OBJECT_VALUE);
     }
 
     /**
@@ -82,13 +93,14 @@ class EnumJsonFormat implements JsonSerializable
         if (isset(self::$instances[$key])) {
             return self::$instances[$key];
         }
-        return self::$instances[$key] = new EnumJsonFormat($key);
+        return self::$instances[$key] = new static($key);
     }
 
     /**
-     * @example location description
      * 
-     * @param AbstractEnum $enum
+     * @param AbstractEnum $enum : Enum {
+     *    private const ENUM_KEY = 'enum_value'
+     * }
      * 
      * @return self
      */

@@ -1,0 +1,21 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "phpUnit": {
+        "configDir": ".\/tests"
+    },
+    "logs": {
+        "text": ".\/infection/report.log"
+    },
+    "mutators": {
+        "@default": true,
+        "@regex": {
+            "ignore": [
+                "Jac\\Enums\\EnumJsonFormat"
+            ]
+        }
+    }
+}

@@ -4,9 +4,20 @@ namespace Jac\Enums;
 
 use JsonSerializable;
 use ReflectionClass;
-use ReflectionException;
 
 /**
+ * Base class for Enum, to create a new enum:
+ *  - Implement this class
+ *  - Define your constants 
+ * Enjoy ! 
+ * 
+ * @link https://github.com/KpnQ/Enums.git for more details
+ * @licence http://www.opensource.org/licenses/mit-license.php 
+ *      MIT (see the LICENSE file)
+ * 
+ * 
+ * @example ../example/TicketStatus.php 
+ * 
  * @psalm-immutable
  */
 abstract class AbstractEnum implements JsonSerializable
@@ -30,7 +41,7 @@ abstract class AbstractEnum implements JsonSerializable
     protected static $keyValueMapCache;
 
     /**
-     * @var array<string, array<string,AbstractEnum>>
+     * @var array<string, array<string, static>>
      */
     protected static $instances;
 
@@ -39,6 +50,7 @@ abstract class AbstractEnum implements JsonSerializable
      * Set as private to avoid construction outside 
      * of the __callStatic or enum method
      * 
+     * @internal Create the singleton instance
      * @param string $key The const to be used
      * @param mixed $value
      */
@@ -49,13 +61,22 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
-     * @param string $key
-     * @param mixed $value : The true type of $value must be scalar as PHP doesn't allow 
-     *                objects in const
+     * Constructor 
+     * 
+     * @param string $key : name of the constants of the enum
+     * @param mixed $value : value of the const 
+     *      The true type of $value must be scalar 
+     *      as PHP doesn't allow objects in const
+     * 
+     * @throws InvalidEnumException
+     * 
+     * @psalm-pure
+     * @psalm-suppress ImpureStaticProperty
+     * @psalm-return static
      */
     final public static function enum(string $key, $value): self
     {
-        if (false === static::inEnum($value) || false === static::inEnum($key)) {
+        if (false === static::inEnum($value) ||  false === static::inEnum($key)) {
             throw new InvalidEnumException(
                 "The couple '$key' '$value' doesn't exists in the enum " . static::class
             );
@@ -65,12 +86,16 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * Helper method to retrieve instances in cache
+     * 
      * @param string $key
      * @param mixed $value
      * 
-     * @return self
+     * @psalm-pure
+     * @psalm-suppress ImpureStaticProperty
+     * @psalm-return static
      */
-    protected static function cachedInitialization(string $key, $value): self
+    final private static function cachedInitialization(string $key, $value): self
     {
         if (isset(static::$instances[static::class][$key])) {
             return static::$instances[static::class][$key];
@@ -88,8 +113,11 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @param string $name
      * @param mixed $arguments
+     * @psalm-pure
+     * @psalm-suppress ImpureStaticProperty
+     * @psalm-return static
      * 
-     * @see ...
+     * @throws InvalidEnumException when the enum value is not valid
      * 
      * @uses static::enum(string $key, $value)
      */
@@ -105,8 +133,11 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * Determine if the given value is valid using either key or value
-     * The type is used to compare
-     *
+     * The type is used to compare so : 
+     *      if the enum value is (int)1 then '1' won't match
+     * 
+     * @psalm-pure
+     * @psalm-suppress ImpureStaticProperty
      * @param mixed $data Either the name of the const or its value
      * 
      * @return bool
@@ -126,6 +157,8 @@ abstract class AbstractEnum implements JsonSerializable
      * Return a Map of available keys => values
      * for the called enum
      * 
+     * @psalm-pure
+     * @psalm-suppress ImpureStaticProperty
      * @return array<string, mixed>
      */
     final public static function toArray(): array
@@ -133,7 +166,9 @@ abstract class AbstractEnum implements JsonSerializable
         if (isset(static::$keyValueMapCache[static::class])) {
             return static::$keyValueMapCache[static::class];
         }
+        /** @psalm-suppress ImpureMethodCall no side-effect due to static::class */
         $enumReflection = new ReflectionClass(static::class);
+        /** @psalm-suppress ImpureMethodCall no side-effect */
         return static::$keyValueMapCache[static::class] = $enumReflection->getConstants();
     }
 
@@ -171,6 +206,11 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * Serialized as string
+     * To customize the serialization :
+     * @see https://github.com/KpnQ/Enums/blob/main/src/EnumJsonFormat.php
+     * 
+     * 
      * @psalm-mutation-free
      * @inheritdoc
      */
@@ -212,7 +252,12 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * Avoid to create a new instance from a var_export,
+     * this will rebuild through the key attribute
+     * 
      * @param mixed $properties
+     * 
+     * @throws InvalidEnumException
      * 
      * @return self
      */
@@ -222,6 +267,6 @@ abstract class AbstractEnum implements JsonSerializable
             return static::{$properties['key']}();
         }
 
-        throw new InvalidEnumException("Unable to set state from " . $properties['key']);
+        throw new InvalidEnumException("Unable to set state from '" . $properties['key'] . "'");
     }
 }

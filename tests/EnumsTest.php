@@ -9,6 +9,15 @@ use PHPUnit\Framework\TestCase;
 
 class EnumTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        // Setup the cache
+        EnumFixture::enum1();
+        EnumFixture::enum2();
+        EnumFixture::enumSecond();
+        EnumFixtureDiff::enum1();
+    }
+
     public function testInEmumWhenValidValueUsed()
     {
         $this->assertTrue(EnumFixture::inEnum('first'));
@@ -91,9 +100,9 @@ class EnumTest extends TestCase
         EnumFixture::{$call}();
     }
 
-    public function testInvalidEnumCall()
+    public function testInvalidEnumCallValueError()
     {
-        $call = 'INVALID';
+        $call = 'ENUM_1';
         $value = 'invalid data';
         $this->expectException(InvalidEnumException::class);
         $this->expectExceptionMessage(
@@ -101,6 +110,39 @@ class EnumTest extends TestCase
         );
         EnumFixture::enum($call, $value);
     }
+
+    public function testInvalidEnumCallKeyError()
+    {
+        $call = 'INVALID';
+        $value = 'first';
+        $this->expectException(InvalidEnumException::class);
+        $this->expectExceptionMessage(
+            "The couple '$call' '$value' doesn't exists in the enum " . EnumFixture::class
+        );
+        EnumFixture::enum($call, $value);
+    }
+
+    public function testInvalidEnumCallKeyAndValueError()
+    {
+        $call = 'INVALID';
+        $value = 'INVALID';
+        $this->expectException(InvalidEnumException::class);
+        $this->expectExceptionMessage(
+            "The couple '$call' '$value' doesn't exists in the enum " . EnumFixture::class
+        );
+        EnumFixture::enum($call, $value);
+    }
+
+    public function testValidEnumCall()
+    {
+        $call = 'ENUM_1';
+        $value = 'first';
+        $this->assertSame(
+            EnumFixture::enum1(),
+            EnumFixture::enum($call, $value)
+        );
+    }
+
 
     public function testClone()
     {
@@ -126,16 +168,17 @@ class EnumTest extends TestCase
     {
         $enum = EnumFixture::enum1();
         $export = var_export($enum, true);
-        eval ('$rebuilt = ' . $export . ';');
+        eval('$rebuilt = ' . $export . ';');
         $this->assertSame($enum, $rebuilt);
     }
 
     public function testSetStateError()
     {
         $this->expectException(InvalidEnumException::class);
+        $this->expectExceptionMessage("Unable to set state from 'faked'");
         $enum = EnumFixture::enum1();
         $export = var_export($enum, true);
-        eval ('$rebuilt = ' . str_replace('ENUM_1', 'faked', $export) . ';');
+        eval('$rebuilt = ' . str_replace('ENUM_1', 'faked', $export) . ';');
     }
 
     public function testJson()
@@ -167,8 +210,16 @@ class EnumTest extends TestCase
         );
 
         $this->assertEquals(
-            "null", 
+            "null",
             json_encode(EnumJsonFormat::asString())
         );
+    }
+
+    public function testEquals()
+    {
+        $this->assertTrue(EnumFixture::enum1() == EnumFixture::enum1(), "Test simple");
+        $this->assertTrue(EnumFixture::enum1() === EnumFixture::enum1(), "Test with type");
+        $this->assertFalse(EnumFixture::enum1() === EnumFixtureDiff::enum1(), "Test typed equals, not same enum class");
+        $this->assertFalse(EnumFixture::enum1() == EnumFixtureDiff::enum1(), "Test simple equals");
     }
 }
