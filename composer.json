@@ -1,0 +1,37 @@
+{
+    "name": "jac/enums",
+    "description": "Php implementation of Enums",
+    "version": "1.0.0-dev",
+    "type": "library",
+    "keywords": ["Enums"],
+    "readme": "./Readme.md",
+    "require-dev": {
+        "phpunit/phpunit": "^8",
+        "vimeo/psalm": "^4.6"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jac",
+            "homepage": "https://github.com/KpnQ/Enums.git"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=7.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Jac\\Enums\\":[
+                "./src/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Jac\\Tests\\Enums\\":[
+                "./tests/"
+            ]
+        }
+    }
+}

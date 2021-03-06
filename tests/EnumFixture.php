@@ -1,6 +1,8 @@
 <?php
 
-use Jac\Enum\AbstractEnum;
+namespace Jac\Tests\Enums;
+
+use Jac\Enums\AbstractEnum;
 
 final class EnumFixture extends AbstractEnum
 {
@@ -9,6 +11,8 @@ final class EnumFixture extends AbstractEnum
     private const ENUM_2 = 'second';
 
     private const ENUM_SECOND = 'second';
+
+    private const ENUM_INT = 10;
 
     public static function enum1(): self 
     {
