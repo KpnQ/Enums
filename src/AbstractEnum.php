@@ -37,17 +37,17 @@ abstract class AbstractEnum implements JsonSerializable
     private $key;
 
     /**
-     * @var array<string, array<string, mixed>>
+     * @var array<string,array<string,mixed>>
      */
     protected static $keyValueMapCache;
 
     /**
-     * @var array<string, array<string, static>>
+     * @var array<string,array<string,static>>
      */
     protected static $instances;
 
     /**
-     * @var array<string, >
+     * @var array<string,string>
      */
     protected static $multiValueDefault;
 
@@ -324,6 +324,22 @@ abstract class AbstractEnum implements JsonSerializable
         return static::class
             . '::' . $this->key
             . '::' . $this->value;
+    }
+
+    /**
+     * Compare both enum by value whereas 
+     *  == and === will also use the key to check 
+     * for equality
+     * 
+     * @param AbstractEnum|null
+     * 
+     * @return bool
+     */
+    public function equals(?AbstractEnum $enum = null): bool
+    {
+        return $enum !== null 
+            && $enum->getValue() === $this->getValue()
+            && static::class === get_class($enum);
     }
 
     /********************************
