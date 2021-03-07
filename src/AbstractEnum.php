@@ -4,6 +4,7 @@ namespace Jac\Enums;
 
 use JsonSerializable;
 use ReflectionClass;
+use ReflectionClassConstant;
 
 /**
  * Base class for Enum, to create a new enum:
@@ -45,6 +46,11 @@ abstract class AbstractEnum implements JsonSerializable
      */
     protected static $instances;
 
+    /**
+     * @var array<string, >
+     */
+    protected static $multiValueDefault;
+
 
     /**
      * Set as private to avoid construction outside 
@@ -85,14 +91,102 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * Lookup for the right enum name from the value
+     * In case multiple keys have the same value, it will try
+     * to find the best option 
+     *      1. Look for the value in the __DEFAULT__ Enum constant to find the default key to use
+     *      2. Use the phpDoc of each constant to find either a @\default or a at least one which is not @\deprecated
+     *      3. Use one the keys
+     */
+    final public static function from($value): self
+    {
+        $keys = static::search($value);
+        if (empty($keys)) {
+            throw new InvalidEnumException("Unable to find a valid key from $value");
+        }
+
+        if (sizeof($keys) === 1) {
+            return self::cachedInitialization($keys[0]);
+        }   
+
+        $defaultKey = self::searchDefaultKey($keys, $value);
+        return self::cachedInitialization($defaultKey);
+    }
+
+    /**
+     * 
+     */
+    final private static function searchDefaultKey(array $keys, $value): string {
+        if (isset(static::$multiValueDefault[static::class][$value])) {
+            return static::$multiValueDefault[static::class][$value];
+        }
+
+        /** 
+         * Lookup in the __DEFAULT__ constant array if it is set 
+         */
+        $classRef = new ReflectionClass(static::class);
+        $defaultsConfig = $classRef->getConstant('__DEFAULT__');
+        if (false !== $defaultsConfig && isset($defaultsConfig[$value])) {
+            return static::$multiValueDefault[static::class][$value] = $defaultsConfig[$value];
+        }
+
+        // Wrong configuration
+        if (empty($keys)) {
+            throw new InvalidEnumException(
+                "No keys were passed as first parameters and no __DEFAULT__ constant set for $value"
+            );
+        }
+
+        /**
+         * Parse the php doc to look up for the best scenario
+         * First try to find a constant with the @default doc
+         * Second exclude from best scenario the @\deprecated ones
+         * Third count all non excluded keys
+         */
+        $defaultKey = '';
+        $deprecatedKey = '';
+        $eligibleKeyCount = 0;
+        foreach ($keys as $key) {
+            $constant = new ReflectionClassConstant(static::class, $key);
+            $phpDoc = $constant->getDocComment() ?: '';
+            if (preg_match('/@default\s/', $phpDoc) === 1) {
+                return static::$multiValueDefault[static::class][$value] = $key;
+            }
+
+            if (preg_match('/@deprecated\s/', $phpDoc) !== 1) {
+                $deprecatedKey = $key;
+                continue;
+            }
+            $eligibleKeyCount++;
+            $defaultKey = $key;
+        }
+
+        /**
+         * Have to use a deprecated key: trigger a compile warning
+         */
+        if (empty($defaultKey)) {
+            trigger_error("An enum set as deprecated has been used for '$key' => '$value'", E_COMPILE_WARNING);
+            return $deprecatedKey;
+        }
+
+        /**
+         * When not all but one is deprecated, we trigger the warning
+         */
+        if ($eligibleKeyCount !== 1) {
+            trigger_error("", E_COMPILE_WARNING);
+        }
+        static::$multiValueDefault[static::class][$value] = $defaultKey;
+        return $defaultKey;
+    }
+
+    /**
      * @param mixed $value
      * 
-     * @return string|false
+     * @return array
      */
-    final public static function search($value)
+    final public static function search($value): array
     {
-        /** @var string|false */
-        return array_search($value, static::toArray(), true);
+        return array_keys(static::toArray(), $value, true);
     }
 
     /**
@@ -152,16 +246,38 @@ abstract class AbstractEnum implements JsonSerializable
      */
     final public static function inEnum($data): bool
     {
-        $validData = static::toArray();
-        foreach ($validData as $name => $value) {
-            if ($name === $data || $data === $value) {
-                return true;
-            }
+        $result = true;
+        if (is_string($data) && static::keyExists($data)) {
+            return true;
         }
-        return false;
+        return static::valueExists($data);
     }
 
     /**
+     * Look into constants' name if it exists
+     * 
+     * @param string $key
+     * @return bool
+     */
+    final public static function keyExists(string $key): bool
+    {
+        return array_key_exists($key, static::toArray());
+    }
+
+    /**
+     * Search if a key exists for the given value
+     * 
+     * @param mixed $value the value to search
+     * @return bool
+     */
+    final public static function valueExists($value): bool
+    {
+        return false === empty(static::search($value));
+    }
+
+    /**
+     * List of available keys
+     * 
      * @return array
      */
     final public static function keys(): array
@@ -170,6 +286,8 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * List of available values, might not be unique
+     * 
      * @return array
      */
     final public static function values(): array
