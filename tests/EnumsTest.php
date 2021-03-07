@@ -143,6 +143,25 @@ class EnumTest extends TestCase
         );
     }
 
+    public function testKeys() {
+        $this->assertEquals(
+            array('ENUM_1', 'ENUM_2', 'ENUM_SECOND', 'ENUM_INT'),
+            EnumFixture::keys()
+        );
+    }
+
+    public function testValues() {
+        $this->assertEquals(
+            array('first', 'second', 'second', 10),
+            EnumFixture::values()
+        );
+    }
+
+    public function testSearch() {
+        $this->assertFalse(EnumFixture::search('notexists'));
+        $this->assertEquals('ENUM_1', EnumFixture::search('first'));
+    }
+
 
     public function testClone()
     {

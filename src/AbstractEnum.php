@@ -52,11 +52,10 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @internal Create the singleton instance
      * @param string $key The const to be used
-     * @param mixed $value
      */
-    final private function __construct(string $key, $value)
+    final private function __construct(string $key)
     {
-        $this->value = $value;
+        $this->value = static::toArray()[$key];
         $this->key = $key;
     }
 
@@ -82,28 +81,37 @@ abstract class AbstractEnum implements JsonSerializable
             );
         }
 
-        return self::cachedInitialization($key, $value);
+        return self::cachedInitialization($key);
+    }
+
+    /**
+     * @param mixed $value
+     * 
+     * @return string|false
+     */
+    final public static function search($value)
+    {
+        /** @var string|false */
+        return array_search($value, static::toArray(), true);
     }
 
     /**
      * Helper method to retrieve instances in cache
      * 
      * @param string $key
-     * @param mixed $value
      * 
      * @psalm-pure
      * @psalm-suppress ImpureStaticProperty
      * @psalm-return static
      */
-    final private static function cachedInitialization(string $key, $value): self
+    final private static function cachedInitialization(string $key): self
     {
         if (isset(static::$instances[static::class][$key])) {
             return static::$instances[static::class][$key];
         }
 
         return static::$instances[static::class][$key] = new static(
-            $key,
-            $value
+            $key
         );
     }
 
@@ -124,7 +132,7 @@ abstract class AbstractEnum implements JsonSerializable
     final public static function __callStatic($name, $arguments)
     {
         if (self::inEnum($name)) {
-            return self::cachedInitialization($name, static::toArray()[$name]);
+            return self::cachedInitialization($name);
         }
         throw new InvalidEnumException(
             "The constant '$name' doesn't exists in the enum " . static::class
@@ -162,8 +170,8 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
-    * @return array
-    */
+     * @return array
+     */
     final public static function values(): array
     {
         return array_values(static::toArray());
