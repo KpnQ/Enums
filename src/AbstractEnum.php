@@ -154,6 +154,23 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * @return array
+     */
+    final public static function keys(): array
+    {
+        return array_keys(static::toArray());
+    }
+
+    /**
+    * @return array
+    */
+    final public static function values(): array
+    {
+        return array_values(static::toArray());
+    }
+
+
+    /**
      * Return a Map of available keys => values
      * for the called enum
      * 
@@ -219,6 +236,10 @@ abstract class AbstractEnum implements JsonSerializable
         return $this->value;
     }
 
+    /************************************
+     *          MAGIC METHODS
+     ************************************/
+
     /**
      * Disable cloning, actually tested
      * @codeCoverageIgnore 
@@ -228,6 +249,7 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
+     * @psalm-mutation-free
      * @param string $name
      * @param mixed $value
      * Disable magic set to avoid mutations
