@@ -47,7 +47,7 @@ abstract class AbstractEnum implements JsonSerializable
     protected static $instances;
 
     /**
-     * @var array<string,string>
+     * @var array<string,array<mixed,string>>
      */
     protected static $multiValueDefault;
 
@@ -97,6 +97,9 @@ abstract class AbstractEnum implements JsonSerializable
      *      1. Look for the value in the __DEFAULT__ Enum constant to find the default key to use
      *      2. Use the phpDoc of each constant to find either a @\default or a at least one which is not @\deprecated
      *      3. Use one the keys
+     * @param mixed $value
+     * 
+     * @return self
      */
     final public static function from($value): self
     {
@@ -107,16 +110,21 @@ abstract class AbstractEnum implements JsonSerializable
 
         if (sizeof($keys) === 1) {
             return self::cachedInitialization($keys[0]);
-        }   
+        }
 
         $defaultKey = self::searchDefaultKey($keys, $value);
         return self::cachedInitialization($defaultKey);
     }
 
+
     /**
+     * @param array $keys
+     * @param mixed $value
      * 
+     * @return string
      */
-    final private static function searchDefaultKey(array $keys, $value): string {
+    final private static function searchDefaultKey(array $keys, $value): string
+    {
         if (isset(static::$multiValueDefault[static::class][$value])) {
             return static::$multiValueDefault[static::class][$value];
         }
@@ -126,15 +134,8 @@ abstract class AbstractEnum implements JsonSerializable
          */
         $classRef = new ReflectionClass(static::class);
         $defaultsConfig = $classRef->getConstant('__DEFAULT__');
-        if (false !== $defaultsConfig && isset($defaultsConfig[$value])) {
+        if (isset($defaultsConfig[$value])) {
             return static::$multiValueDefault[static::class][$value] = $defaultsConfig[$value];
-        }
-
-        // Wrong configuration
-        if (empty($keys)) {
-            throw new InvalidEnumException(
-                "No keys were passed as first parameters and no __DEFAULT__ constant set for $value"
-            );
         }
 
         /**
@@ -149,11 +150,11 @@ abstract class AbstractEnum implements JsonSerializable
         foreach ($keys as $key) {
             $constant = new ReflectionClassConstant(static::class, $key);
             $phpDoc = $constant->getDocComment() ?: '';
-            if (preg_match('/@default\s/', $phpDoc) === 1) {
+            if (preg_match('/@default(\s|\n)/', $phpDoc)) {
                 return static::$multiValueDefault[static::class][$value] = $key;
             }
 
-            if (preg_match('/@deprecated\s/', $phpDoc) !== 1) {
+            if (preg_match('/@deprecated(\s|\n)/', $phpDoc)) {
                 $deprecatedKey = $key;
                 continue;
             }
@@ -165,21 +166,22 @@ abstract class AbstractEnum implements JsonSerializable
          * Have to use a deprecated key: trigger a compile warning
          */
         if (empty($defaultKey)) {
-            trigger_error("An enum set as deprecated has been used for '$key' => '$value'", E_COMPILE_WARNING);
+            user_error("An enum set as deprecated has been used for '$deprecatedKey' => '$value'", E_USER_WARNING);
             return $deprecatedKey;
         }
 
         /**
          * When not all but one is deprecated, we trigger the warning
          */
-        if ($eligibleKeyCount !== 1) {
-            trigger_error("", E_COMPILE_WARNING);
+        if ($eligibleKeyCount > 1) {
+            user_error("More than one key where found despite analysis", E_USER_WARNING);
         }
         static::$multiValueDefault[static::class][$value] = $defaultKey;
         return $defaultKey;
     }
 
     /**
+     * @psalm-pure
      * @param mixed $value
      * 
      * @return array
@@ -249,7 +251,7 @@ abstract class AbstractEnum implements JsonSerializable
         if ($data === '__DEFAULT__') {
             return false;
         }
-        $result = true;
+
         if (is_string($data) && static::keyExists($data)) {
             return true;
         }
@@ -258,7 +260,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * Look into constants' name if it exists
-     * 
+     * @psalm-pure
      * @param string $key
      * @return bool
      */
@@ -269,7 +271,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * Search if a key exists for the given value
-     * 
+     * @psalm-pure
      * @param mixed $value the value to search
      * @return bool
      */
@@ -334,17 +336,16 @@ abstract class AbstractEnum implements JsonSerializable
     }
 
     /**
-     * Compare both enum by value whereas 
-     *  == and === will also use the key to check 
-     * for equality
+     * Compare both enum by value whereas == and === 
+     * will also use the key to check for equality
      * 
-     * @param AbstractEnum|null
+     * @param AbstractEnum|null $enum
      * 
      * @return bool
      */
     public function equals(?AbstractEnum $enum = null): bool
     {
-        return $enum !== null 
+        return $enum !== null
             && $enum->getValue() === $this->getValue()
             && static::class === get_class($enum);
     }

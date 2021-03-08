@@ -2,7 +2,22 @@ Escaped mutants:
 ================
 
 
-1) C:\Users\jimas\Documents\Projects\Php\Enums\src\EnumJsonFormat.php:91    [M] ProtectedVisibility
+1) C:\Users\jimas\Documents\Projects\Php\Enums\src\AbstractEnum.php:111    [M] OneZeroInteger
+
+--- Original
++++ New
+@@ @@
+         if (empty($keys)) {
+             throw new InvalidEnumException("Unable to find a valid key from {$value}");
+         }
+-        if (sizeof($keys) === 1) {
++        if (sizeof($keys) === 0) {
+             return self::cachedInitialization($keys[0]);
+         }
+         $defaultKey = self::searchDefaultKey($keys, $value);
+
+
+2) C:\Users\jimas\Documents\Projects\Php\Enums\src\EnumJsonFormat.php:91    [M] ProtectedVisibility
 
 --- Original
 +++ New
