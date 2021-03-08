@@ -1,0 +1,21 @@
+language: php
+
+php:
+ - '7.2'
+ - '7.3'
+ - '7.4'
+
+matrix:
+  fast_finish: true
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_script:
+  - travis_retry composer install -n
+
+script:
+  - vendor/bin/phpunit --coverage-clover=coverage.xml
+  - vendor/bin/psalm --shepherd
+  - vendor/bin/infection --threads=4 --log-verbosity=none
