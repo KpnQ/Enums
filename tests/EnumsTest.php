@@ -10,6 +10,7 @@ class EnumTest extends TestCase
 {
     public static function setUpBeforeClass(): void
     {
+        set_error_handler(function ($errno, $errstr, $errfile, $errline) {echo $errstr;});
         // Setup the cache
         EnumFixture::enum1();
         EnumFixture::enum2();
@@ -268,6 +269,8 @@ class EnumTest extends TestCase
         $this->assertSame(MultiValueFixture::NO_DEPRECATED(), MultiValueFixture::from('2'));
 
         $this->assertSame(MultiValueFixture::DEFAULT(), MultiValueFixture::from('1'));
+        $this->expectOutputString("More than one key where found despite analysis");
+        $this->assertInstanceOf(EnumFixtureDiff::class, EnumFixtureDiff::from('three'));
     }
 
     public function testFromWhenNoKeys()
@@ -276,15 +279,15 @@ class EnumTest extends TestCase
         EnumFixture::from('notExitst');
     }
 
-    public function testFromWhenAlldeprecated() 
+    public function testFromWhenAllDeprecated() 
     {
-        $this->expectWarning();
-        MultiValueFixture::from('3');
+        $this->expectOutputString("An enum set as deprecated has been used for 'ONLY_DEPRECATED_' => '3'");
+        $this->assertInstanceOf(MultiValueFixture::class, MultiValueFixture::from('3'));
     }
 
     public function testFromWhenNoConf() 
     {
-        $this->expectWarning();
-        MultiValueFixture::from('4');
+        $this->expectOutputString("More than one key where found despite analysis");
+        $this->assertInstanceOf(MultiValueFixture::class, MultiValueFixture::from('4'));
     }
 }
