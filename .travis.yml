@@ -16,6 +16,6 @@ before_script:
   - travis_retry composer install -n
 
 script:
-  - --coverage-xml coverage.xml -c ./tests/phpunit.xml
+  - vendor/bin/phpunit --coverage-xml coverage.xml -c ./tests/phpunit.xml
   - vendor/bin/psalm --shepherd
   - vendor/bin/infection --threads=4 --log-verbosity=none
