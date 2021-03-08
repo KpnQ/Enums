@@ -2,7 +2,6 @@
 
 namespace Jac\Tests\Enums;
 
-use IncludedEnum;
 use Jac\Enums\EnumJsonFormat;
 use Jac\Enums\InvalidEnumException;
 use PHPUnit\Framework\TestCase;
@@ -18,14 +17,14 @@ class EnumTest extends TestCase
         EnumFixtureDiff::enum1();
     }
 
-    public function testInEmumWhenValidValueUsed()
+    public function testInEnumWhenValidValueUsed()
     {
         $this->assertTrue(EnumFixture::inEnum('first'));
         $this->assertTrue(EnumFixture::inEnum('second'));
         $this->assertTrue(EnumFixture::inEnum(10));
     }
 
-    public function testInEmumWhenInvalidValueUsed()
+    public function testInEnumWhenInvalidValueUsed()
     {
         $this->assertFalse(EnumFixture::inEnum('fst'));
         $this->assertFalse(EnumFixture::inEnum('10'));
@@ -33,6 +32,7 @@ class EnumTest extends TestCase
         $this->assertFalse(EnumFixture::inEnum(null));
         $this->assertFalse(EnumFixture::inEnum(false));
         $this->assertFalse(EnumFixture::inEnum(true));
+        $this->assertFalse(EnumFixture::inEnum('__DEFAULT__'));
     }
 
     public function testInEmumWhenValidKeyUsed()
@@ -158,8 +158,24 @@ class EnumTest extends TestCase
     }
 
     public function testSearch() {
-        $this->assertFalse(EnumFixture::search('notexists'));
-        $this->assertEquals('ENUM_1', EnumFixture::search('first'));
+        $this->assertEmpty(EnumFixture::search('10'));
+        $this->assertEmpty(EnumFixture::search('notexists'));
+        $this->assertEquals(array('ENUM_1'), EnumFixture::search('first'));
+        $this->assertFalse(EnumFixture::valueExists('notexists'));
+        $this->assertTrue(EnumFixture::valueExists('first'));
+    }
+
+    public function testKeyExists()
+    {
+        $this->assertFalse(EnumFixture::keyExists('notexists'));
+        $this->assertTrue(EnumFixture::keyExists('ENUM_1'));
+    }
+
+    public function testEqualValue() {
+        $this->assertTrue(EnumFixture::enum1()->equals(EnumFixture::enum1()));
+        $this->assertFalse(EnumFixture::enum1()->equals(EnumFixtureDiff::enum1()));
+        $this->assertFalse(EnumFixture::enum1()->equals(null));
+        $this->assertTrue(EnumFixture::enum2()->equals(EnumFixture::enumSecond()));
     }
 
 
@@ -240,5 +256,35 @@ class EnumTest extends TestCase
         $this->assertTrue(EnumFixture::enum1() === EnumFixture::enum1(), "Test with type");
         $this->assertFalse(EnumFixture::enum1() === EnumFixtureDiff::enum1(), "Test typed equals, not same enum class");
         $this->assertFalse(EnumFixture::enum1() == EnumFixtureDiff::enum1(), "Test simple equals");
+    }
+
+    public function testFrom() {
+        $this->assertSame(EnumFixture::enum1(), EnumFixture::from('first'));
+        // test cache
+        $this->assertSame(EnumFixture::enum1(), EnumFixture::from('first'));
+
+        $this->assertSame(MultiValueFixture::CONFIG_DEFAULT(), MultiValueFixture::from('5'));
+
+        $this->assertSame(MultiValueFixture::NO_DEPRECATED(), MultiValueFixture::from('2'));
+
+        $this->assertSame(MultiValueFixture::DEFAULT(), MultiValueFixture::from('1'));
+    }
+
+    public function testFromWhenNoKeys()
+    {
+        $this->expectException(InvalidEnumException::class);
+        EnumFixture::from('notExitst');
+    }
+
+    public function testFromWhenAlldeprecated() 
+    {
+        $this->expectWarning();
+        MultiValueFixture::from('3');
+    }
+
+    public function testFromWhenNoConf() 
+    {
+        $this->expectWarning();
+        MultiValueFixture::from('4');
     }
 }

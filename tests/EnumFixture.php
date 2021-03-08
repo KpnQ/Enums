@@ -28,4 +28,6 @@ final class EnumFixture extends AbstractEnum
     {
         return self::enum('ENUM_SECOND', self::ENUM_SECOND);
     }
+
+    private const __DEFAULT__ = array('empty' => '');
 }

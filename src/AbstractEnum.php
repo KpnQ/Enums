@@ -246,6 +246,9 @@ abstract class AbstractEnum implements JsonSerializable
      */
     final public static function inEnum($data): bool
     {
+        if ($data === '__DEFAULT__') {
+            return false;
+        }
         $result = true;
         if (is_string($data) && static::keyExists($data)) {
             return true;
@@ -312,7 +315,11 @@ abstract class AbstractEnum implements JsonSerializable
         /** @psalm-suppress ImpureMethodCall no side-effect due to static::class */
         $enumReflection = new ReflectionClass(static::class);
         /** @psalm-suppress ImpureMethodCall no side-effect */
-        return static::$keyValueMapCache[static::class] = $enumReflection->getConstants();
+        $keyValue = $enumReflection->getConstants();
+        if (isset($keyValue['__DEFAULT__'])) {
+            unset($keyValue['__DEFAULT__']);
+        }
+        return static::$keyValueMapCache[static::class] = $keyValue;
     }
 
     /**
