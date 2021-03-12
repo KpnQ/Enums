@@ -17,7 +17,7 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
-  - travis_retry composer install -n
+  - travis_retry composer update
 
 script:
   - mkdir -p build/logs
