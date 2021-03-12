@@ -21,9 +21,9 @@ before_script:
 
 script:
   - mkdir -p build/logs
-  - vendor/bin/phpunit -c ./tests/phpunit.xml
+  - vendor/bin/phpunit --coverage-xml coverage.xml -c ./tests/phpunit.xml
   - vendor/bin/psalm --shepherd
+  - travis_retry vendor/bin/infection --threads=4 --log-verbosity=none
 
 after_success:
   - travis_retry vendor/bin/php-coveralls
-  - travis_retry vendor/bin/infection --threads=4 --log-verbosity=none
