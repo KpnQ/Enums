@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.com/KpnQ/Enums.svg?branch=main)](https://travis-ci.com/KpnQ/Enums)
 [![psalm](https://shepherd.dev/github/KpnQ/Enums/coverage.svg)](https://shepherd.dev/githubKpnQ/Enums)
+[![Coverage Status](https://coveralls.io/repos/github/KpnQ/Enums/badge.svg?branch=main)](https://coveralls.io/github/KpnQ/Enums?branch=main)
 
 # Enum implementation for PHP
 
