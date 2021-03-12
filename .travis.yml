@@ -20,6 +20,10 @@ before_script:
   - travis_retry composer install -n
 
 script:
-  - vendor/bin/phpunit --coverage-clover coverage.xml -c ./tests/phpunit.xml
+  - mkdir -p build/logs
+  - vendor/bin/phpunit -c ./tests/phpunit.xml
   - vendor/bin/psalm --shepherd
-  - vendor/bin/infection --threads=4 --log-verbosity=none
+
+after_success:
+  - travis_retry vendor/bin/php-coveralls
+  - travis_retry vendor/bin/infection --threads=4 --log-verbosity=none
