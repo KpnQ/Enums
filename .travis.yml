@@ -1,3 +1,7 @@
+env:
+  global:
+    - XDEBUG_MODE=coverage
+
 language: php
 
 php:
@@ -16,6 +20,6 @@ before_script:
   - travis_retry composer install -n
 
 script:
-  - vendor/bin/phpunit --coverage-xml coverage.xml -c ./tests/phpunit.xml
+  - vendor/bin/phpunit --coverage-clover coverage.xml -c ./tests/phpunit.xml
   - vendor/bin/psalm --shepherd
   - vendor/bin/infection --threads=4 --log-verbosity=none
