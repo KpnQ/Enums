@@ -8,8 +8,12 @@
         "configDir": ".\/tests"
     },
     "logs": {
-        "text": ".\/infection/report.log"
+        "text": ".\/infection/report.log",
+         "badge": {
+            "branch": "main"
+        }
     },
+}
     "mutators": {
         "@default": true,
         "@regex": {
