@@ -111,7 +111,7 @@ class EnumJsonFormat implements JsonSerializable
     }
 
     /**
-     * @return string|null|array
+     * @return string|int|null|array
      */
     final public function jsonSerialize()
     {
