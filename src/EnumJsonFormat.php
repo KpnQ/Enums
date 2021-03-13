@@ -33,7 +33,7 @@ class EnumJsonFormat implements JsonSerializable
     private $dataToFormat = null;
 
     /**
-     * @var array<string, self>
+     * @var array<string,self>
      */
     private static $instances = array();
 
@@ -128,7 +128,7 @@ class EnumJsonFormat implements JsonSerializable
     /**
      * @param AbstractEnum $enum
      * @psalm-pure
-     * @return mixed
+     * @return string|int
      */
     private static function toStringStrategy(AbstractEnum $enum)
     {

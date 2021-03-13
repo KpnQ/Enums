@@ -26,7 +26,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * @readonly
-     * @var mixed
+     * @var int|string
      */
     private $value;
 
@@ -37,7 +37,7 @@ abstract class AbstractEnum implements JsonSerializable
     private $key;
 
     /**
-     * @var array<string,array<string,mixed>>
+     * @var array<string,array<string,int|string>>
      */
     protected static $keyValueMapCache;
 
@@ -47,7 +47,7 @@ abstract class AbstractEnum implements JsonSerializable
     protected static $instances;
 
     /**
-     * @var array<string,array<mixed,string>>
+     * @var array<string,array<int|string,string>>
      */
     protected static $multiValueDefault;
 
@@ -69,7 +69,7 @@ abstract class AbstractEnum implements JsonSerializable
      * Constructor 
      * 
      * @param string $key : name of the constants of the enum
-     * @param mixed $value : value of the const 
+     * @param int|string $value : value of the const 
      *      The true type of $value must be scalar 
      *      as PHP doesn't allow objects in const
      * 
@@ -97,7 +97,7 @@ abstract class AbstractEnum implements JsonSerializable
      *      1. Look for the value in the __DEFAULT__ Enum constant to find the default key to use
      *      2. Use the phpDoc of each constant to find either a @\default or a at least one which is not @\deprecated
      *      3. Use one the keys
-     * @param mixed $value
+     * @param int|string $value
      * 
      * @return self
      */
@@ -119,7 +119,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * @param array $keys
-     * @param mixed $value
+     * @param int|string $value
      * 
      * @return string
      */
@@ -182,7 +182,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * @psalm-pure
-     * @param mixed $value
+     * @param int|string $value
      * 
      * @return array
      */
@@ -242,7 +242,7 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @psalm-pure
      * @psalm-suppress ImpureStaticProperty
-     * @param mixed $data Either the name of the const or its value
+     * @param int|string $data Either the name of the const or its value
      * 
      * @return bool
      */
@@ -272,7 +272,7 @@ abstract class AbstractEnum implements JsonSerializable
     /**
      * Search if a key exists for the given value
      * @psalm-pure
-     * @param mixed $value the value to search
+     * @param int|string $value the value to search
      * @return bool
      */
     final public static function valueExists($value): bool
@@ -307,7 +307,7 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @psalm-pure
      * @psalm-suppress ImpureStaticProperty
-     * @return array<string, mixed>
+     * @return array<string,int|string>
      */
     final public static function toArray(): array
     {
@@ -365,7 +365,7 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * @psalm-mutation-free
-     * @return mixed
+     * @return int|string
      */
     final public function getValue()
     {
@@ -380,6 +380,8 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @psalm-mutation-free
      * @inheritdoc
+     * 
+     * @return int|string
      */
     public function jsonSerialize()
     {
@@ -401,7 +403,7 @@ abstract class AbstractEnum implements JsonSerializable
     /**
      * @psalm-mutation-free
      * @param string $name
-     * @param mixed $value
+     * @param int|string $value
      * Disable magic set to avoid mutations
      */
     final public function __set($name, $value)
@@ -411,6 +413,8 @@ abstract class AbstractEnum implements JsonSerializable
 
     /**
      * @param string $name
+     * 
+     * @return int|string|null
      * 
      * Can be used to access 'value' and 'key'
      * But should prefer the official getters
@@ -427,7 +431,7 @@ abstract class AbstractEnum implements JsonSerializable
      * Avoid to create a new instance from a var_export,
      * this will rebuild through the key attribute
      * 
-     * @param mixed $properties
+     * @param array $properties
      * 
      * @throws InvalidEnumException
      * 

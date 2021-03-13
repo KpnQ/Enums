@@ -271,6 +271,8 @@ class EnumTest extends TestCase
         $this->assertSame(MultiValueFixture::DEFAULT(), MultiValueFixture::from('1'));
         $this->expectOutputString("More than one key where found despite analysis");
         $this->assertInstanceOf(EnumFixtureDiff::class, EnumFixtureDiff::from('three'));
+
+        $this->assertSame(EnumFixtureDiff::ENUM_THREE(), EnumFixtureDiff::from('three'), "Test cache");
     }
 
     public function testFromWhenNoKeys()

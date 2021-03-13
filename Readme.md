@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.com/KpnQ/Enums.svg?branch=main)](https://travis-ci.com/KpnQ/Enums)
 [![psalm](https://shepherd.dev/github/KpnQ/Enums/coverage.svg)](https://shepherd.dev/githubKpnQ/Enums)
 [![Coverage Status](https://coveralls.io/repos/github/KpnQ/Enums/badge.svg?branch=main)](https://coveralls.io/github/KpnQ/Enums?branch=main)
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FKpnQ%2FEnums%2Fmain)](https://dashboard.stryker-mutator.io/reports/github.com/KpnQ/Enums/main)
 
 # Enum implementation for PHP
 
