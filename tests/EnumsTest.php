@@ -272,7 +272,7 @@ class EnumTest extends TestCase
         $this->expectOutputString("More than one key where found despite analysis");
         $this->assertInstanceOf(EnumFixtureDiff::class, EnumFixtureDiff::from('three'));
 
-        $this->assertSame(EnumFixtureDiff::ENUM_THREE(), EnumFixtureDiff::from('three'), "Test cache"p);
+        $this->assertSame(EnumFixtureDiff::ENUM_THREE(), EnumFixtureDiff::from('three'), "Test cache");
     }
 
     public function testFromWhenNoKeys()
