@@ -118,7 +118,7 @@ Comparison of enums works with == and ===
 
 Static method
 
-- `enum(string, mixed)` Create an instance of the enum giving its key and its value, key are mandatory due to the possibility to have multiple value for the same key
+- `enum(string)` Create an instance of the enum giving its key
 - `from(mixed)` Create an enum from its value, see [Multiple] to understand more about its behavior
 - `toArray()` return the list of key => value  of the enum
 - `inEnum()` check if the parameter is either a key or a value
@@ -161,10 +161,3 @@ Will output
     }
 }
 ```
-
-## TODO
-
-- [ ] Create a method search
-- [ ] Split split validation for key and value
-- [ ] Allow serialization/deserialization
-- [ ] Allow to define default key when multiple key share the same value
