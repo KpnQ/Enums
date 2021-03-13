@@ -69,9 +69,6 @@ abstract class AbstractEnum implements JsonSerializable
      * Constructor 
      * 
      * @param string $key : name of the constants of the enum
-     * @param int|string $value : value of the const 
-     *      The true type of $value must be scalar 
-     *      as PHP doesn't allow objects in const
      * 
      * @throws InvalidEnumException
      * 
@@ -79,11 +76,11 @@ abstract class AbstractEnum implements JsonSerializable
      * @psalm-suppress ImpureStaticProperty
      * @psalm-return static
      */
-    final public static function enum(string $key, $value): self
+    final public static function enum(string $key): self
     {
-        if (false === static::inEnum($value) ||  false === static::inEnum($key)) {
+        if (false === static::inEnum($key)) {
             throw new InvalidEnumException(
-                "The couple '$key' '$value' doesn't exists in the enum " . static::class
+                "The couple '$key' doesn't exists in the enum " . static::class
             );
         }
 
@@ -199,8 +196,8 @@ abstract class AbstractEnum implements JsonSerializable
      * @psalm-pure
      * @psalm-suppress ImpureStaticProperty
      * @psalm-return static
-     */
-    final private static function cachedInitialization(string $key): self
+     */ 
+    final private static function cachedInitialization(string $key)
     {
         if (isset(static::$instances[static::class][$key])) {
             return static::$instances[static::class][$key];
@@ -223,7 +220,7 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @throws InvalidEnumException when the enum value is not valid
      * 
-     * @uses static::enum(string $key, $value)
+     * @uses static::cachedInitialization(string $key)
      */
     final public static function __callStatic($name, $arguments)
     {
@@ -328,7 +325,7 @@ abstract class AbstractEnum implements JsonSerializable
      * @psalm-mutation-free
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return static::class
             . '::' . $this->key
@@ -435,7 +432,7 @@ abstract class AbstractEnum implements JsonSerializable
      * 
      * @throws InvalidEnumException
      * 
-     * @return self
+     * @psalm-return static
      */
     final public static function __set_state($properties)
     {

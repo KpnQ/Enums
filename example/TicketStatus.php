@@ -31,6 +31,6 @@ final class TicketStatus extends AbstractEnum
      */
     public static function NEW(): self
     {
-        return self::enum('NEW_STATUS', self::NEW_STATUS);
+        return self::enum('NEW_STATUS');
     }
 }

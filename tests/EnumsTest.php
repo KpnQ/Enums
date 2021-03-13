@@ -101,46 +101,22 @@ class EnumTest extends TestCase
         EnumFixture::{$call}();
     }
 
-    public function testInvalidEnumCallValueError()
-    {
-        $call = 'ENUM_1';
-        $value = 'invalid data';
-        $this->expectException(InvalidEnumException::class);
-        $this->expectExceptionMessage(
-            "The couple '$call' '$value' doesn't exists in the enum " . EnumFixture::class
-        );
-        EnumFixture::enum($call, $value);
-    }
-
     public function testInvalidEnumCallKeyError()
     {
         $call = 'INVALID';
-        $value = 'first';
         $this->expectException(InvalidEnumException::class);
         $this->expectExceptionMessage(
-            "The couple '$call' '$value' doesn't exists in the enum " . EnumFixture::class
+            "The couple '$call' doesn't exists in the enum " . EnumFixture::class
         );
-        EnumFixture::enum($call, $value);
-    }
-
-    public function testInvalidEnumCallKeyAndValueError()
-    {
-        $call = 'INVALID';
-        $value = 'INVALID';
-        $this->expectException(InvalidEnumException::class);
-        $this->expectExceptionMessage(
-            "The couple '$call' '$value' doesn't exists in the enum " . EnumFixture::class
-        );
-        EnumFixture::enum($call, $value);
+        EnumFixture::enum($call);
     }
 
     public function testValidEnumCall()
     {
         $call = 'ENUM_1';
-        $value = 'first';
         $this->assertSame(
             EnumFixture::enum1(),
-            EnumFixture::enum($call, $value)
+            EnumFixture::enum($call)
         );
     }
 

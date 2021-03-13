@@ -16,6 +16,6 @@ class EnumFixtureDiff extends AbstractEnum
 
     public static function enum1(): self 
     {
-        return self::enum('ENUM_1', self::ENUM_1);
+        return self::enum('ENUM_1');
     }
 }

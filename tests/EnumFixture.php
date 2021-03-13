@@ -16,17 +16,17 @@ final class EnumFixture extends AbstractEnum
 
     public static function enum1(): self 
     {
-        return self::enum('ENUM_1', self::ENUM_1);
+        return self::enum('ENUM_1');
     }
 
     public static function enum2(): self 
     {
-        return self::enum('ENUM_2', self::ENUM_2);
+        return self::enum('ENUM_2');
     }
 
     public static function enumSecond(): self 
     {
-        return self::enum('ENUM_SECOND', self::ENUM_SECOND);
+        return self::enum('ENUM_SECOND');
     }
 
     private const __DEFAULT__ = array('empty' => '');
